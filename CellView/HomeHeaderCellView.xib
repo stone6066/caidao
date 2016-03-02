@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="9531" systemVersion="14F1605" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES">
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="9529"/>
+        <capability name="Alignment constraints to the first baseline" minToolsVersion="6.0"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner"/>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <collectionReusableView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="U6b-Vx-4bR" customClass="HomeHeaderCellView">
+            <rect key="frame" x="0.0" y="0.0" width="463" height="50"/>
+            <autoresizingMask key="autoresizingMask"/>
+            <subviews>
+                <view contentMode="scaleToFill" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="KLP-9R-I53">
+                    <rect key="frame" x="0.0" y="0.0" width="463" height="50"/>
+                    <subviews>
+                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="m11-xe-Jfz" userLabel="mainTitle">
+                            <rect key="frame" x="8" y="10" width="133" height="28"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="133" id="gJc-bE-d25"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="22"/>
+                            <color key="textColor" red="0.93725490196078431" green="0.40784313725490196" blue="0.062745098039215685" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                        <label opaque="NO" userInteractionEnabled="NO" tag="1" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="当季食材 先享为快" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="waV-QY-77D" userLabel="dealTitle">
+                            <rect key="frame" x="296" y="14" width="159" height="21"/>
+                            <constraints>
+                                <constraint firstAttribute="width" constant="159" id="MYu-pq-NwU"/>
+                            </constraints>
+                            <fontDescription key="fontDescription" type="system" pointSize="18"/>
+                            <color key="textColor" red="0.80000000000000004" green="0.80000000000000004" blue="0.80000000000000004" alpha="1" colorSpace="calibratedRGB"/>
+                            <nil key="highlightedColor"/>
+                        </label>
+                    </subviews>
+                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    <constraints>
+                        <constraint firstItem="waV-QY-77D" firstAttribute="firstBaseline" secondItem="m11-xe-Jfz" secondAttribute="firstBaseline" id="5wR-pg-yUf"/>
+                        <constraint firstItem="waV-QY-77D" firstAttribute="top" secondItem="KLP-9R-I53" secondAttribute="top" constant="14" id="Arf-XU-89s"/>
+                        <constraint firstItem="m11-xe-Jfz" firstAttribute="leading" secondItem="KLP-9R-I53" secondAttribute="leadingMargin" id="aX1-uP-4Hh"/>
+                        <constraint firstItem="waV-QY-77D" firstAttribute="centerY" secondItem="m11-xe-Jfz" secondAttribute="centerY" id="hwJ-Ce-PrC"/>
+                        <constraint firstAttribute="trailing" secondItem="waV-QY-77D" secondAttribute="trailing" constant="8" id="kOD-uM-Mqo"/>
+                        <constraint firstItem="waV-QY-77D" firstAttribute="centerY" secondItem="KLP-9R-I53" secondAttribute="centerY" id="nrE-pL-32W"/>
+                    </constraints>
+                </view>
+            </subviews>
+            <constraints>
+                <constraint firstItem="KLP-9R-I53" firstAttribute="leading" secondItem="U6b-Vx-4bR" secondAttribute="leading" constant="1" id="CBT-zT-xwS"/>
+                <constraint firstAttribute="bottom" secondItem="KLP-9R-I53" secondAttribute="bottom" constant="1" id="KgC-lm-3fy"/>
+                <constraint firstItem="KLP-9R-I53" firstAttribute="top" secondItem="U6b-Vx-4bR" secondAttribute="top" constant="1" id="cZk-vy-Vaa"/>
+                <constraint firstAttribute="trailing" secondItem="KLP-9R-I53" secondAttribute="trailing" constant="1" id="nHs-dg-Vj5"/>
+            </constraints>
+            <connections>
+                <outlet property="dealTitle" destination="waV-QY-77D" id="zky-XY-PZj"/>
+                <outlet property="mainTitle" destination="m11-xe-Jfz" id="gxc-SM-Ib9"/>
+            </connections>
+            <point key="canvasLocation" x="312.5" y="237"/>
+        </collectionReusableView>
+    </objects>
+</document>

@@ -8,9 +8,7 @@
 
 #import <UIKit/UIKit.h>
 
-@interface AccountViewController : UIViewController<UIWebViewDelegate>
-{
-    UIWebView *webView;
-    UIActivityIndicatorView *activityIndicator;
-}
+@interface AccountViewController : UIViewController<UITableViewDelegate,UITableViewDataSource>
+@property(nonatomic,strong)UITableView* tableView;
+
 @end

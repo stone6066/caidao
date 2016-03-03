@@ -26,9 +26,6 @@ UITextField * _seachTextF;
 {
     self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
     if (self) {
-//        self.tabBarItem = [[UITabBarItem alloc] initWithTitle:nil
-//                                                        image:[UIImage imageNamed:@"assortment.png"]
-//                                                selectedImage:[UIImage imageNamed:@"assortment@2x.png"]];
         self.tabBarItem.selectedImage = [[UIImage imageNamed:@"assortment_selected"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         self.tabBarItem.image = [[UIImage imageNamed:@"assortment"] imageWithRenderingMode:UIImageRenderingModeAlwaysOriginal];
         NSString *tittxt=@"分类";
@@ -43,7 +40,6 @@ UITextField * _seachTextF;
     [super viewWillAppear:animated];
     [self loadsortSeachView];
     [self loadSortView];
-     NSLog(@"分类");
 }
 
 
@@ -58,12 +54,12 @@ UITextField * _seachTextF;
     for (int i=0; i<countMax; i++) {
         
         rightMeun * meun=[[rightMeun alloc] init];
-        meun.meunName=[NSString stringWithFormat:@"菜单%d",i];
+        meun.meunName=[NSString stringWithFormat:@"左侧列表%d",i];
         NSMutableArray * sub=[NSMutableArray arrayWithCapacity:0];
         
         
         rightMeun * meun1=[[rightMeun alloc] init];
-        meun1.meunName=[NSString stringWithFormat:@"菜单%d标题",i];
+        meun1.meunName=[NSString stringWithFormat:@"右侧组%d标题",i];
         
         [sub addObject:meun1];
         
@@ -74,7 +70,7 @@ UITextField * _seachTextF;
         for ( int z=0; z <i+1; z++) {
             
             rightMeun * meun2=[[rightMeun alloc] init];
-            meun2.meunName=[NSString stringWithFormat:@"菜单%d标签%d",i,z];
+            meun2.meunName=[NSString stringWithFormat:@"右侧%d标签%d",i,z];
             [zList addObject:meun2];
             
         }

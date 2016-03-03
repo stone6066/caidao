@@ -7,11 +7,13 @@
 //
 
 #import "NewsViewController.h"
-
 #import "PublicDefine.h"
 #import "DPAPI.h"
 #import "MJRefresh.h"
 #import "goodsViewController.h"
+#import "dealModel.h"
+#import "NewsTableViewCell.h"
+#import "GzwTableViewLoading.h"
 
 @interface NewsViewController ()<DPRequestDelegate,MJRefreshBaseViewDelegate>
 {
@@ -32,8 +34,22 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-   
+    [self loadNavTopView];
+    [self loadTableView];
+    [self loadBackToTopBtn];
+    
+    // 如果出现加载菊花和tableView重复出现的话，就设置FooterView，因为tableView默认对没有数据的列表也会显示cell
+    self.tableView.tableFooterView = [UIView new];
+    
+    [self.tableView gzwLoading:^{
+        NSLog(@"再点我就肛你");
+        [self loadData];
+    }];
     // Do any additional setup after loading the view.
+}
+-(void)loadData{
+    _pageindex=1;
+    [self createRequest];
 }
 -(void)dealloc
 {
@@ -64,14 +80,10 @@
 }
 -(void)viewWillAppear:(BOOL)animated
 {
-    //[self.navigationController setNavigationBarHidden:YES animated:YES];
-    //[super viewWillAppear:animated];
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:YES];
-    //NSLog(@"发现");
-    [self loadNavTopView];
-    
-    [self loadBackToTopBtn];
+    _pageindex=1;
+    [self createRequest];
 }
 
 -(void)loadBackToTopBtn{
@@ -101,13 +113,99 @@
     }
 }
 
+-(void)loadTableView{
+    self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, TopSeachHigh, fDeviceWidth, fDeviceHeight-TopSeachHigh-MainTabbarHeight)];
+    self.tableView.delegate=self;
+    self.tableView.dataSource=self;
+    self.tableView.tableFooterView = [[UIView alloc]init];
+    [self.view addSubview:self.tableView];
+    self.tableView.backgroundColor=collectionBgdColor;
+    [self.tableView registerClass:[NewsTableViewCell class] forCellReuseIdentifier:@"newsCellId"];
+    _tableDataSource=[[NSMutableArray alloc]init];
+    _newsAllwaysFlash=@"0";
+    //[self setHomeLastUpdateTime];
 
+    // 3.集成刷新控件
+    // 3.1.下拉刷新
+    MJRefreshHeaderView *header = [MJRefreshHeaderView header];
+    header.scrollView = self.tableView;
+    header.delegate = self;
+    // 自动刷新
+    
+    _header = header;
+    //NSLog(@"%@",_header.lastUpdateTimeLabel.text);
+    
+    // 集成刷新控件
+    // 上拉刷新
+    MJRefreshFooterView *footer = [MJRefreshFooterView footer];
+    footer.scrollView = self.tableView;
+    footer.delegate = self;
+    _footer = footer;
+}
 
+# pragma 网络请求
+- (void)createRequest{
+    self.tableView.loading = YES;
+    DPAPI *api = [[DPAPI alloc]init];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc]init];
+    
+    [params setValue:@"indexVilliageGoods" forKey:@"ut"];
+    [params setValue:[NSNumber numberWithInteger:20] forKey:@"pageSize"];
+    [params setValue:[NSNumber numberWithInteger:_pageindex] forKey:@"pageNo"];
+    [api setAllwaysFlash:_newsAllwaysFlash];
+    [api requestWithURL:NetUrl params:params delegate:self];
+}
+
+-(void)request:(DPRequest *)request didFinishLoadingWithResult:(id)result
+{
+    //NSLog(@"相应：%@",result);
+    NSDictionary *dict = result;
+    dealModel *md = [[dealModel alloc]init];
+    NSArray *datatmp=[md asignModelWithDict:dict];
+    if (_pageindex==1) {
+        [_tableDataSource removeAllObjects];
+    }
+    [_tableDataSource addObjectsFromArray:datatmp];
+   
+    if (_tableDataSource.count == 0) {
+        self.tableView.loading = NO;
+    }
+    
+    [self.tableView reloadData];
+}
+
+-(void)request:(DPRequest *)request didFailWithError:(NSError *)error
+{
+    NSLog(@"报错了：%@",error);
+}
 
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section
 {
     return _tableDataSource.count;
+}
+
+- (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    
+     NewsTableViewCell *cell = [tableView dequeueReusableCellWithIdentifier:@"newsCellId" forIndexPath:indexPath];
+    
+    // 将数据视图框架模型(该模型中包含了数据模型)赋值给Cell，
+    dealModel *dm=_tableDataSource[indexPath.item];
+    [cell showUiNewsCell:dm];
+    return cell;
+    
+}
+
+- (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 200;
+}
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    NewsTableViewCell *svc =(NewsTableViewCell*)[self.tableView cellForRowAtIndexPath:indexPath];
+    
+    NSLog(@"%ld---cellUrl:%@",indexPath.item,svc.dealUrl);
+    
 }
 
 #pragma mark - 刷新控件的代理方法
@@ -134,16 +232,13 @@
     if (myRang.length>0) {//下拉强制刷新
         DPAPI *api = [[DPAPI alloc]init];
         NSMutableDictionary *params = [[NSMutableDictionary alloc]init];
-        _selectedCityName=@"成都";
-        _selectedCategory=@"";
-        _pageindex=1;
-        [params setValue:_selectedCityName forKey:@"city"];
-        [params setValue:[NSNumber numberWithInteger:_pageindex] forKey:@"page"];
-        _newsAllwaysFlash=@"1";//强制刷新
-        
+         _pageindex=1;
+         _newsAllwaysFlash=@"1";//强制刷新
+        [params setValue:@"indexVilliageGoods" forKey:@"ut"];
+        [params setValue:[NSNumber numberWithInteger:20] forKey:@"pageSize"];
+        [params setValue:[NSNumber numberWithInteger:_pageindex] forKey:@"pageNo"];
         [api setAllwaysFlash:_newsAllwaysFlash];
-        [api requestWithURL:@"v1/deal/find_deals" params:params delegate:self];
-        
+        [api requestWithURL:NetUrl params:params delegate:self];
         // 2.2秒后刷新表格UI
         [self performSelector:@selector(doneWithView:) withObject:refreshView afterDelay:2.0];
     }
@@ -151,13 +246,12 @@
     {
         DPAPI *api = [[DPAPI alloc]init];
         NSMutableDictionary *params = [[NSMutableDictionary alloc]init];
-        _selectedCityName=@"成都";
-        _selectedCategory=@"";
         _pageindex+=1;
-        [params setValue:_selectedCityName forKey:@"city"];
-        [params setValue:[NSNumber numberWithInteger:_pageindex] forKey:@"page"];
+        [params setValue:@"indexVilliageGoods" forKey:@"ut"];
+        [params setValue:[NSNumber numberWithInteger:20] forKey:@"pageSize"];
+        [params setValue:[NSNumber numberWithInteger:_pageindex] forKey:@"pageNo"];
         [api setAllwaysFlash:_newsAllwaysFlash];
-        [api requestWithURL:@"v1/deal/find_deals" params:params delegate:self];
+        [api requestWithURL:NetUrl params:params delegate:self];
         
         // 2.2秒后刷新表格UI
         [self performSelector:@selector(doneWithView:) withObject:refreshView afterDelay:2.0];
@@ -174,12 +268,6 @@
 {
     UIView *topSearch=[[UIView alloc]initWithFrame:CGRectMake(0, 0, fDeviceWidth, TopSeachHigh)];
     topSearch.backgroundColor=topSearchBgdColor;
-//    UIButton *back = [UIButton buttonWithType:UIButtonTypeCustom];
-//    back.titleLabel.font = [UIFont boldSystemFontOfSize:13];
-//    [back setFrame:CGRectMake(8, 24, 60, 24)];
-//    [back setBackgroundImage:[UIImage imageNamed:@"bar_back"] forState:UIControlStateNormal];
-//    [back addTarget:self action:@selector(clickleftbtn) forControlEvents:UIControlEventTouchUpInside];
-//    [topSearch addSubview:back];
     
     UILabel *viewTitle=[[UILabel alloc]initWithFrame:CGRectMake(fDeviceWidth/2-30, 16, 50, 40)];
     viewTitle.text=@"发现";
@@ -189,4 +277,6 @@
     
     [self.view addSubview:topSearch];
 }
+
+
 @end

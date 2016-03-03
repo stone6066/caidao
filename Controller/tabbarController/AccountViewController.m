@@ -121,11 +121,10 @@
 }
 -(void)loadTableView{
     
-    self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, TopSeachHigh+150, fDeviceWidth, fDeviceHeight-TopSeachHigh-150-100)];
+    self.tableView=[[UITableView alloc]initWithFrame:CGRectMake(0, TopSeachHigh+150, fDeviceWidth, fDeviceHeight-TopSeachHigh-MainTabbarHeight)];
     self.tableView.delegate=self;
     self.tableView.dataSource=self;
     self.tableView.tableFooterView = [[UIView alloc]init];
-    //self.tableView.separatorStyle = UITableViewCellSeparatorStyleNone;
     [self.view addSubview:self.tableView];
     
     _tableDataSource=[[NSMutableArray alloc]initWithObjects:@"我的订单",@"待付款订单",@"已发货物流查询",@"收货地址管理",@"个人资料", nil];

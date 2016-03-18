@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 
 @interface SortViewController : UIViewController
-
+- (NSArray *)asignModelWithDict:(NSDictionary *)dict;
 @end

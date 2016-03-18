@@ -13,8 +13,10 @@
 #import "sortDealViewController.h"
 #import "SYQRCodeViewController.h"
 #import "goodsViewController.h"
+#import "DPAPI.h"
+#import "sortModel.h"
 
-@interface SortViewController ()<UITextFieldDelegate>
+@interface SortViewController ()<UITextFieldDelegate,DPRequestDelegate>
 {
 UITextField * _seachTextF;
 }
@@ -39,49 +41,48 @@ UITextField * _seachTextF;
     [self.navigationController setNavigationBarHidden:YES animated:YES];
     [super viewWillAppear:animated];
     [self loadsortSeachView];
-    [self loadSortView];
+    [self typeCreateRequest];
+    
 }
 
 
--(void)loadSortView{
-    NSMutableArray * menuAllLis=[NSMutableArray arrayWithCapacity:0];
-    
-    
+-(void)loadSortView:(NSArray*)dataArr{
+    //NSMutableArray * menuAllLis=[NSMutableArray arrayWithCapacity:0];
     /**
      *  构建需要数据 2层或者3层数据 (ps 2层也当作3层来处理)
      */
-    NSInteger countMax=6;
-    for (int i=0; i<countMax; i++) {
-        
-        rightMeun * meun=[[rightMeun alloc] init];
-        meun.meunName=[NSString stringWithFormat:@"左侧列表%d",i];
-        NSMutableArray * sub=[NSMutableArray arrayWithCapacity:0];
-        
-        
-        rightMeun * meun1=[[rightMeun alloc] init];
-        meun1.meunName=[NSString stringWithFormat:@"右侧组%d标题",i];
-        
-        [sub addObject:meun1];
-        
-        
-        NSMutableArray *zList=[NSMutableArray arrayWithCapacity:0];
-        
-        
-        for ( int z=0; z <i+1; z++) {
-            
-            rightMeun * meun2=[[rightMeun alloc] init];
-            meun2.meunName=[NSString stringWithFormat:@"右侧%d标签%d",i,z];
-            [zList addObject:meun2];
-            
-        }
-        
-        meun1.nextArray=zList;
-        
-        
-        
-        meun.nextArray=sub;
-        [menuAllLis addObject:meun];
-    }
+//    NSInteger countMax=6;
+//    for (int i=0; i<countMax; i++) {
+//        
+//        rightMeun * meun=[[rightMeun alloc] init];
+//        meun.meunName=[NSString stringWithFormat:@"左侧列表%d",i];
+//        NSMutableArray * sub=[NSMutableArray arrayWithCapacity:0];
+//        
+//        
+//        rightMeun * meun1=[[rightMeun alloc] init];
+//        meun1.meunName=[NSString stringWithFormat:@"右侧组%d标题",i];
+//        
+//        [sub addObject:meun1];
+//        
+//        
+//        NSMutableArray *zList=[NSMutableArray arrayWithCapacity:0];
+//        
+//        
+//        for ( int z=0; z <i+1; z++) {
+//            
+//            rightMeun * meun2=[[rightMeun alloc] init];
+//            meun2.meunName=[NSString stringWithFormat:@"右侧%d标签%d",i,z];
+//            [zList addObject:meun2];
+//            
+//        }
+//        
+//        meun1.nextArray=zList;
+//        
+//        
+//        
+//        meun.nextArray=sub;
+//        [menuAllLis addObject:meun];
+//    }
     
     /**
      *  适配 ios 7 和ios 8 的 坐标系问题
@@ -93,7 +94,7 @@ UITextField * _seachTextF;
      
      :returns: <#return value description#>
      */
-    MultilevelMenu * view=[[MultilevelMenu alloc] initWithFrame:CGRectMake(0, TopSeachHigh, fDeviceWidth, fDeviceHeight-TopSeachHigh) WithData:menuAllLis withSelectIndex:^(NSInteger left, NSInteger right,rightMeun* info) {
+    MultilevelMenu * view=[[MultilevelMenu alloc] initWithFrame:CGRectMake(0, TopSeachHigh, fDeviceWidth, fDeviceHeight-TopSeachHigh-MainTabbarHeight) WithData:dataArr withSelectIndex:^(NSInteger left, NSInteger right,rightMeun* info) {
         sortDealViewController *sortDealView=[[sortDealViewController alloc]init];
         //sortDealView.navigationItem.title=info.meunName;
         sortDealView.hidesBottomBarWhenPushed=YES;
@@ -136,11 +137,11 @@ UIImage * sbundleImageImageName(NSString  *imageName)
 {
     UIView *topSearch=[[UIView alloc]initWithFrame:CGRectMake(0, 0, fDeviceWidth, TopSeachHigh)];
     topSearch.backgroundColor=topSearchBgdColor;
-    UIImageView * seachLogo = [[UIImageView alloc] initWithFrame:CGRectMake(5, 25, 30, 30)];
-    seachLogo.userInteractionEnabled = YES;
-    seachLogo.image =[UIImage imageNamed:@"topLogo"];
-    seachLogo.userInteractionEnabled = YES;
-    [topSearch addSubview:seachLogo];
+//    UIImageView * seachLogo = [[UIImageView alloc] initWithFrame:CGRectMake(5, 25, 30, 30)];
+//    seachLogo.userInteractionEnabled = YES;
+//    seachLogo.image =[UIImage imageNamed:@"topLogo"];
+//    seachLogo.userInteractionEnabled = YES;
+//    [topSearch addSubview:seachLogo];
     
     UIImageView * seachBgV = [[UIImageView alloc] initWithFrame:CGRectMake(45, 25, fDeviceWidth-95, 30)];
     seachBgV.userInteractionEnabled = YES;
@@ -249,6 +250,27 @@ UIImage * sbundleImageImageName(NSString  *imageName)
     [textField resignFirstResponder]; //键盘按下return，这句代码可以隐藏 键盘
     [self doSeach:nil];
     return YES;
+}
+
+
+//下载分类数据
+- (void)typeCreateRequest{
+    DPAPI *api = [[DPAPI alloc]init];
+    NSMutableDictionary *params = [[NSMutableDictionary alloc]init];
+   
+    [params setValue:@"typeandbrand" forKey:@"ut"];
+    
+    [api setAllwaysFlash:@"1"];
+    
+    [api typeRequestWithURL: NetUrl params:params delegate:self];
+}
+
+-(void)typerequest:(DPRequest *)request didFinishLoadingWithResult:(id)result
+{
+    NSDictionary *dict = result;
+    sortModel *SM=[[sortModel alloc]init];
+    NSArray *datatmp=[SM asignModelWithDict:dict];
+    [self loadSortView:datatmp];
 }
 /*
 #pragma mark - Navigation
